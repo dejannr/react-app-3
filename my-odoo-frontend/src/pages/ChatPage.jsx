@@ -7,6 +7,7 @@ import ChatHeader    from '../components/chat/ChatHeader.jsx'
 import ChatWindow    from '../components/chat/ChatWindow.jsx'
 import ChatBubble    from '../components/chat/ChatBubble.jsx'
 import ChatInput     from '../components/chat/ChatInput.jsx'
+import '../styles/resetstyle.css'
 
 export default function ChatPage() {
   // fetch user
@@ -35,15 +36,38 @@ export default function ChatPage() {
 
   const header = <ChatHeader title={`Chat as ${user.name}`} />
 
+  // return (
+  //   <ChatContainer header={header}>
+  //     <ChatWindow
+  //       messages={msgs.map((m,i) => (
+  //         <ChatBubble key={i} from={m.from}>{m.text}</ChatBubble>
+  //       ))}
+  //     />
+  //     <ChatInput onSend={handleSend} disabled={bLoading} />
+  //     {bError && <p style={{ color: 'red', textAlign: 'center' }}>Error: {bError.message}</p>}
+  //   </ChatContainer>
+  // )
   return (
-    <ChatContainer header={header}>
-      <ChatWindow
-        messages={msgs.map((m,i) => (
-          <ChatBubble key={i} from={m.from}>{m.text}</ChatBubble>
-        ))}
-      />
-      <ChatInput onSend={handleSend} disabled={bLoading} />
-      {bError && <p style={{ color: 'red', textAlign: 'center' }}>Error: {bError.message}</p>}
-    </ChatContainer>
+      <>
+        <div className="chat-wrapper">
+          <div className="chat-sidepanel">
+            <div className="bubble"></div>
+            <div className="bubble"></div>
+            <div className="bubble"></div>
+            <div className="bubble"></div>
+
+          </div>
+          <div className="chat-main">
+            <div className="window">
+              <div className="content"></div>
+            </div>
+            <div className="input">
+              <div className="content">
+                <input type="text" placeholder="Type here..."/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
   )
 }
