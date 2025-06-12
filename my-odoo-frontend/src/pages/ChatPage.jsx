@@ -1,33 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { useFetch }      from '../hooks/useFetch.jsx'
-import { usePost }       from '../hooks/usePost.jsx'
-import '../styles/chat.css'  // create this for simple styling
+// src/pages/ChatPage.jsx
+import React, { useState, useEffect } from 'react'
+import { useFetch } from '../hooks/useFetch.jsx'
+import { usePost }  from '../hooks/usePost.jsx'
+import ChatContainer from '../components/chat/ChatContainer.jsx'
+import ChatHeader    from '../components/chat/ChatHeader.jsx'
+import ChatWindow    from '../components/chat/ChatWindow.jsx'
+import ChatBubble    from '../components/chat/ChatBubble.jsx'
+import ChatInput     from '../components/chat/ChatInput.jsx'
 
 export default function ChatPage() {
-  // 1) ensure user is logged in
+  // fetch user
   const { data: user, loading: uLoading, error: uError } = useFetch('/get_username', {}, true)
-
-  // 2) chat hook
+  // chat post
   const { data: bot, loading: bLoading, error: bError, postData } = usePost('/chat')
 
-  // local message list
   const [msgs, setMsgs] = useState([])
-  const inputRef = useRef()
 
-  // when bot responds, append to msgs
+  // append bot reply
   useEffect(() => {
-    if (bot && bot.reply) {
+    if (bot?.reply) {
       setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
     }
   }, [bot])
 
-  // send handler
-  const send = () => {
-    const txt = inputRef.current.value.trim()
-    if (!txt) return
-    setMsgs(prev => [...prev, { from: 'user', text: txt }])
-    postData({ message: txt })
-    inputRef.current.value = ''
+  const handleSend = (text) => {
+    setMsgs(prev => [...prev, { from: 'user', text }])
+    postData({ message: text })
   }
 
   if (uLoading) return <p>Checking login…</p>
@@ -35,29 +33,17 @@ export default function ChatPage() {
     return <p style={{ color: 'crimson' }}>Please log in to Odoo first.</p>
   }
 
+  const header = <ChatHeader title={`Chat as ${user.name}`} />
+
   return (
-    <div className="chat-container">
-      <header className="chat-header">
-        Chat as <strong>{user.name}</strong>
-      </header>
-      <div className="chat-window">
-        {msgs.map((m, i) => (
-          <div key={i} className={`chat-msg ${m.from}`}>
-            {m.text}
-          </div>
+    <ChatContainer header={header}>
+      <ChatWindow
+        messages={msgs.map((m,i) => (
+          <ChatBubble key={i} from={m.from}>{m.text}</ChatBubble>
         ))}
-        {(bLoading) && <div className="chat-msg bot">…</div>}
-        {(bError)   && <div className="chat-msg bot error">Error: {bError.message}</div>}
-      </div>
-      <div className="chat-input">
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="Type a message…"
-          onKeyDown={e => e.key === 'Enter' && send()}
-        />
-        <button onClick={send}>Send</button>
-      </div>
-    </div>
+      />
+      <ChatInput onSend={handleSend} disabled={bLoading} />
+      {bError && <p style={{ color: 'red', textAlign: 'center' }}>Error: {bError.message}</p>}
+    </ChatContainer>
   )
 }
