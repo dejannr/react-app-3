@@ -109,16 +109,26 @@
   width: 300px;
   height: 100%;
   background-color: #181818;
+
+}
+
+.chat-sidepanel .logo {
+
+
+
+}
+
+.chat-sidepanel .bubbles {
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
   padding-top: 50px;
 
-
 }
 
-.chat-sidepanel .bubble {
+.chat-sidepanel .bubbles .bubble {
 
   height: 50px;
   width: 80%;
@@ -194,9 +204,30 @@
 
 }
 
+.chat-main .input .content .attach {
+
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  background-color: #515151;
+  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+
+}
+
+.chat-main .input .content .attach img {
+
+  width: 50%;
+
+}
+
 .chat-main .input .content input {
 
-  width: calc(100% - 40px);
+  width: calc(100% - 140px);
   border: none;
   outline: none;
   padding: 0;
@@ -205,5 +236,26 @@
   height: 60px;
   font-size: 16px;
   color: #fff;
+
+}
+
+.chat-main .input .content .send {
+
+  width: 50px;
+  height: 50px;
+  border-radius: 100px;
+  background-color: #515151;
+  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+}
+
+.chat-main .input .content .send img {
+
+  width: 50%;
+  margin-right: 3px;
 
 }

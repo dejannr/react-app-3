@@ -7,6 +7,8 @@ import ChatHeader    from '../components/chat/ChatHeader.jsx'
 import ChatWindow    from '../components/chat/ChatWindow.jsx'
 import ChatBubble    from '../components/chat/ChatBubble.jsx'
 import ChatInput     from '../components/chat/ChatInput.jsx'
+import attachIcon from '../img/attach.png'
+import sendIcon from '../img/send.png'
 import '../styles/resetstyle.css'
 
 export default function ChatPage() {
@@ -51,11 +53,13 @@ export default function ChatPage() {
       <>
         <div className="chat-wrapper">
           <div className="chat-sidepanel">
-            <div className="bubble"></div>
-            <div className="bubble"></div>
-            <div className="bubble"></div>
-            <div className="bubble"></div>
-
+            <div className="logo"></div>
+            <div className="bubbles">
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+            </div>
           </div>
           <div className="chat-main">
             <div className="window">
@@ -63,7 +67,13 @@ export default function ChatPage() {
             </div>
             <div className="input">
               <div className="content">
+                <div className="attach">
+                  <img src={attachIcon} alt=""/>
+                </div>
                 <input type="text" placeholder="Type here..."/>
+                <div className="send">
+                  <img src={sendIcon} alt=""/>
+                </div>
               </div>
             </div>
           </div>
