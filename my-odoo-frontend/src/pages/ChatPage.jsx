@@ -21,6 +21,7 @@ export default function ChatPage() {
   const { data: bot, loading: bLoading, error: bError, postData } = usePost('/chat')
 
   const [msgs, setMsgs] = useState([])
+  const [showFilters, setShowFilters] = useState(false)        // ← NEW
 
   // append bot reply
   useEffect(() => {
@@ -55,12 +56,13 @@ export default function ChatPage() {
   return (
       <>
         <div className="chat-wrapper">
+          {/* —————————————————— SIDEPANEL —————————————————— */}
           <div className="chat-sidepanel">
             <div className="logo">
               <img src={logo} alt=""/>
               {/*<h2>Lupa Direct</h2>*/}
             </div>
-            <h2 class="heading">Chats</h2>
+            <h2 className="heading">Chats</h2>
             <div className="bubbles">
               <div className="bubble active">
                 <h3>2024_42 Disruption log May 22/May 23</h3>
@@ -76,23 +78,34 @@ export default function ChatPage() {
               </div>
             </div>
           </div>
-          <div className="chat-filters">
-            <div className="overlay"></div>
+
+          {/* —————————————————— FILTERS (slides in/out) —————————————————— */}
+          <div className={`chat-filters ${showFilters ? 'open' : 'hidden'}`}>
+            <div
+              className="overlay"
+              onClick={() => setShowFilters(false)}
+            />
             <div className="content">
-              <div className="close">
+              <div className="close" onClick={() => setShowFilters(false)}>
                 <img src={closeIcon} alt=""/>
               </div>
             </div>
           </div>
+
+          {/* —————————————————— MAIN CHAT —————————————————— */}
           <div className="chat-main">
             <div className="window">
               <div className="content">
-                <div className="options-icon">
+                <div
+                  className="options-icon"
+                  onClick={() => setShowFilters(true)}     // ← OPEN PANEL
+                >
                   <img src={filtersIcon} alt=""/>
                 </div>
                 <div className="messages">
                   <div className="bubble user">
-                    <p>Are you ready to rock and roll?</p></div>
+                    <p>Are you ready to rock and roll?</p>
+                  </div>
                   <div className="bubble bot">
                     <p>Absolutely! Let’s rock and roll—what’s on the agenda today?</p>
                   </div>
@@ -155,7 +168,7 @@ export default function ChatPage() {
             <div className="input">
               <div className="content">
                 <div className="attach">
-                <img src={attachIcon} alt=""/>
+                  <img src={attachIcon} alt=""/>
                 </div>
                 <input type="text" placeholder="Type here..."/>
                 <div className="send">
