@@ -9,6 +9,7 @@ import ChatBubble    from '../components/chat/ChatBubble.jsx'
 import ChatInput     from '../components/chat/ChatInput.jsx'
 import attachIcon from '../img/attach.png'
 import sendIcon from '../img/send.png'
+import logo from '../img/logo.png'
 import '../styles/resetstyle.css'
 
 export default function ChatPage() {
@@ -53,12 +54,24 @@ export default function ChatPage() {
       <>
         <div className="chat-wrapper">
           <div className="chat-sidepanel">
-            <div className="logo"></div>
+            <div className="logo">
+              <img src={logo} alt=""/>
+              {/*<h2>Lupa Direct</h2>*/}
+            </div>
+            <h2 class="heading">Chats</h2>
             <div className="bubbles">
-              <div className="bubble"></div>
-              <div className="bubble"></div>
-              <div className="bubble"></div>
-              <div className="bubble"></div>
+              <div className="bubble active">
+                <h3>2024_42 Disruption log May 22/May 23</h3>
+              </div>
+              <div className="bubble">
+                <h3>2024_42 Disruption log May 24/May 25</h3>
+              </div>
+              <div className="bubble">
+                <h3>2024_42 Disruption log May 26/May 27</h3>
+              </div>
+              <div className="bubble">
+                <h3>2024_42 Disruption log May 28/May 29</h3>
+              </div>
             </div>
           </div>
           <div className="chat-main">
