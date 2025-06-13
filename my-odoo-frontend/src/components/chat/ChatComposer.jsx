@@ -39,7 +39,7 @@ export default function ChatComposer({ onSend, onCancel, waiting = false }) {
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && submit()}
-          disabled={waiting}
+          // disabled={waiting}
         />
 
         <div
