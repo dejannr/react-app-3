@@ -187,6 +187,51 @@
 
 }
 
+.chat-filters {
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  right: 0;
+  top: 0;
+  z-index: 999;
+  display: flex;
+
+}
+
+.chat-filters .overlay {
+
+  width: 30%;
+  height: 100%;
+  background-color: #000;
+  opacity: 0.5;
+
+}
+
+.chat-filters .content {
+
+  width: 70%;
+  height: 100%;
+  background-color: #fff;
+  position: relative;
+
+}
+
+.chat-filters .content .close {
+
+  position: absolute;
+  top: 20px;
+  left: 20px;
+
+}
+
+.chat-filters .content .close img {
+
+  width: 25px;
+  height: 25px;
+
+}
+
 .chat-main {
 
   margin-left: 300px;

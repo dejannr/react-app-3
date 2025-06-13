@@ -10,6 +10,7 @@ import ChatInput     from '../components/chat/ChatInput.jsx'
 import attachIcon from '../img/attach.png'
 import sendIcon from '../img/send.png'
 import filtersIcon from '../img/filters.png'
+import closeIcon from '../img/close.png'
 import logo from '../img/logo.png'
 import '../styles/resetstyle.css'
 
@@ -72,6 +73,14 @@ export default function ChatPage() {
               </div>
               <div className="bubble">
                 <h3>2024_42 Disruption log May 28/May 29</h3>
+              </div>
+            </div>
+          </div>
+          <div className="chat-filters">
+            <div className="overlay"></div>
+            <div className="content">
+              <div className="close">
+                <img src={closeIcon} alt=""/>
               </div>
             </div>
           </div>
