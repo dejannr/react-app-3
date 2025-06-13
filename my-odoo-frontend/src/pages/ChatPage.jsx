@@ -76,12 +76,73 @@ export default function ChatPage() {
           </div>
           <div className="chat-main">
             <div className="window">
-              <div className="content"></div>
+              <div className="content">
+                <div className="messages">
+                  <div className="bubble user">
+                    <p>Are you ready to rock and roll?</p></div>
+                  <div className="bubble bot">
+                    <p>Absolutely! Let’s rock and roll—what’s on the agenda today?</p>
+                  </div>
+                  <div className="bubble user">
+                    <p>Tell me something about excavation.</p>
+                  </div>
+                  <div className="bubble bot">
+                     <h1>Excavation</h1>
+                      <p>
+                        Excavation is the process of removing earth, rock or other materials from a site
+                        to form a cavity, hole or foundation. It’s fundamental in fields ranging from
+                        construction and mining to archaeology.
+                      </p>
+
+                      <h2>1. Purposes of Excavation</h2>
+                      <ul>
+                        <li><strong>Construction:</strong> Creating foundations, basements, trenches for utilities, roadbeds and tunnels.</li>
+                        <li><strong>Mining &amp; Quarrying:</strong> Accessing mineral deposits by open-pit or underground methods.</li>
+                        <li><strong>Archaeology:</strong> Carefully uncovering artifacts and features to study past human activity.</li>
+                      </ul>
+
+                      <h2>2. Methods &amp; Equipment</h2>
+                      <ul>
+                        <li><strong>Manual Excavation:</strong> Hand tools like shovels, picks and trowels—common in small-scale or sensitive archaeological digs.</li>
+                        <li><strong>Mechanical Excavation:</strong> Hydraulic excavators, backhoes, bulldozers, trenchers and tunnel-boring machines for larger projects.</li>
+                        <li><strong>Specialized Techniques:</strong>
+                          <ul>
+                            <li><em>Dewatering</em> to remove groundwater from trenches.</li>
+                            <li><em>Blasting</em> in rock to break it into manageable pieces.</li>
+                          </ul>
+                        </li>
+                      </ul>
+
+                      <h2>3. Typical Excavation Workflow</h2>
+                      <ol>
+                        <li><strong>Site Investigation:</strong> Soil surveys and testing to determine ground conditions.</li>
+                        <li><strong>Planning &amp; Permitting:</strong> Establishing cut/fill volumes, access points, environmental safeguards, and obtaining regulatory approvals.</li>
+                        <li><strong>Pre-Excavation Safety:</strong> Installing shoring or benching to prevent cave-ins; setting up erosion and sediment controls.</li>
+                        <li><strong>Excavation &amp; Hauling:</strong> Removing material in lifts (layers), loading it into trucks or conveyors for disposal or reuse.</li>
+                        <li><strong>Inspection &amp; Backfill:</strong> Verifying depths, grades and dimensions; backfilling around structures once installations are complete.</li>
+                      </ol>
+
+                      <h2>4. Safety Considerations</h2>
+                      <ul>
+                        <li><strong>Protective Systems:</strong> Sloping (cutting back walls at an angle), benching (stepped levels) or shoring (pneumatic, hydraulic or timber supports) to prevent trench collapse.</li>
+                        <li><strong>Utilities Mark-Out:</strong> Locating and avoiding underground cables, pipes or sewers.</li>
+                        <li><strong>Personal Protective Equipment (PPE):</strong> Helmets, steel-toe boots, high-visibility clothing and respiratory protection when needed.</li>
+                      </ul>
+
+                      <h2>5. Environmental &amp; Regulatory Aspects</h2>
+                      <ul>
+                        <li><strong>Erosion Control:</strong> Silt fences, hay bales or stabilizing mats to keep sediment on-site.</li>
+                        <li><strong>Spoil Management:</strong> Planning for storage or reuse of excavated material.</li>
+                        <li><strong>Permitting:</strong> Wetland or heritage-site clearances, noise and dust regulations.</li>
+                      </ul>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="input">
               <div className="content">
                 <div className="attach">
-                  <img src={attachIcon} alt=""/>
+                <img src={attachIcon} alt=""/>
                 </div>
                 <input type="text" placeholder="Type here..."/>
                 <div className="send">
