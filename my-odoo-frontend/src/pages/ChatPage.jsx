@@ -62,6 +62,9 @@ export default function ChatPage() {
               <img src={logo} alt=""/>
               {/*<h2>Lupa Direct</h2>*/}
             </div>
+            <div className="search">
+              <input type="text" placeholder='Search...'/>
+            </div>
             <h2 className="heading">Chats</h2>
             <div className="bubbles">
               <div className="bubble active">

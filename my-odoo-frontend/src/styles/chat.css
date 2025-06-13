@@ -141,6 +141,26 @@
 
 }
 
+.chat-sidepanel .search {
+
+  width: calc(100% - 40px);
+  margin: 0 auto;
+
+}
+
+.chat-sidepanel .search input {
+
+  width: 100%;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  height: 40px;
+  font-size: 16px;
+  border-bottom: 1px solid #ccc;
+
+}
 .chat-sidepanel .bubbles {
 
   display: flex;
@@ -200,7 +220,7 @@
 
 /* —— Dark overlay ———————————————————————————————————————— */
 .chat-filters .overlay {
-  width: 30%;
+  width: 60%;
   background: #000;
   opacity: 0;
   transition: opacity .25s ease;
@@ -209,7 +229,7 @@
 
 /* —— Sliding white panel —————————————————————————————————— */
 .chat-filters .content {
-  width: 70%;
+  width: 40%;
   height: 100%;
   background: #fff;
   position: relative;
