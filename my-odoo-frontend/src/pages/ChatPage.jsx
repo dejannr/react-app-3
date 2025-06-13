@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useFetch } from '../hooks/useFetch.jsx'
-import { usePost }  from '../hooks/usePost.jsx'
+import { usePost  } from '../hooks/usePost.jsx'     // ← same path, updated file
 
 import ChatWrapper   from '../components/chat/ChatWrapper.jsx'
 import ChatSidepanel from '../components/chat/ChatSidepanel.jsx'
@@ -11,19 +11,20 @@ import '../styles/resetstyle.css'
 import '../styles/chat.css'
 
 export default function ChatPage() {
-  /* ────────── Odoo-user check ────────── */
+  /* ─────────── Login check ─────────── */
   const { data: user, loading: uLoading, error: uError } =
     useFetch('/get_username', {}, true)
 
-  /* ────────── Bot POST hook ────────── */
+  /* ─────────── POST hook with cancel ─────────── */
   const {
     data:    bot,
     loading: bLoading,
     error:   bError,
     postData,
+    cancel,                      // ← new cancel fn
   } = usePost('/chat')
 
-  /* ────────── Dummy starter conversation ────────── */
+  /* ───── Dummy starter conversation ───── */
   const initialBotReply = (
     <>
       <h1>Excavation</h1>
@@ -56,40 +57,39 @@ export default function ChatPage() {
     { from: 'bot',  component: initialBotReply },
   ])
 
-  /* ────────── UI state ────────── */
+  /* ───── UI state ───── */
   const [showFilters, setShowFilters] = useState(false)
-  const [canceled,    setCanceled]    = useState(false)
-  const ignoreNextReply = useRef(false)   // discard late reply if true
+  const ignoreNextReply = useRef(false)
 
-  /* ────────── Send & Cancel ────────── */
+  /* ───── Handlers ───── */
   const handleSend = (text) => {
     ignoreNextReply.current = false
-    setCanceled(false)
     setMsgs(prev => [...prev, { from: 'user', text }])
     postData({ message: text })
   }
 
   const handleCancel = () => {
+    cancel()                                      // ← abort request
     ignoreNextReply.current = true
-    setCanceled(true)
-    // ⬇️ turn the cancel into a real bot bubble
-    setMsgs(prev => [...prev, { from: 'bot', text: 'You canceled the message' }])
+    setMsgs(prev => [...prev,
+      { from: 'bot', text: 'You canceled the message' },
+    ])
   }
 
-  /* ────────── Append bot reply if not canceled ────────── */
+  /* Append bot reply only if not canceled */
   useEffect(() => {
     if (bot?.reply && !ignoreNextReply.current) {
       setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
     }
   }, [bot])
 
-  /* ────────── Early returns ────────── */
+  /* ───── Early returns ───── */
   if (uLoading) return <p>Checking login…</p>
   if (uError || !user?.login) {
     return <p style={{ color: 'crimson' }}>Please log in to Odoo first.</p>
   }
 
-  /* ────────── Dummy chat list ────────── */
+  /* Dummy chat list */
   const chatList = [
     { id: 1, title: '2024_42 Disruption log May 22/May 23', active: true },
     { id: 2, title: '2024_42 Disruption log May 24/May 25' },
@@ -97,7 +97,7 @@ export default function ChatPage() {
     { id: 4, title: '2024_42 Disruption log May 28/May 29' },
   ]
 
-  /* ────────── Render ────────── */
+  /* ───── Render ───── */
   return (
     <ChatWrapper>
       <ChatSidepanel chats={chatList} />
@@ -111,7 +111,6 @@ export default function ChatPage() {
         messages={msgs}
         loading={bLoading}
         error={bError}
-        canceled={canceled}
         onSend={handleSend}
         onCancel={handleCancel}
         onOpenFilters={() => setShowFilters(true)}
