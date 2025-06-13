@@ -190,11 +190,11 @@
 /* —— Wrapper ——————————————————————————————————————————————— */
 .chat-filters {
   position: fixed;
-  inset: 0;                       /* full-screen */
+  inset: 0;
   display: flex;
-  opacity: 0;                     /* start invisible   */
-  pointer-events: none;           /* ignore clicks     */
-  transition: opacity .30s ease;  /* fade in / out     */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .30s ease;
   z-index: 999;
 }
 
@@ -202,8 +202,9 @@
 .chat-filters .overlay {
   width: 30%;
   background: #000;
-  opacity: 0;                     /* start transparent */
-  transition: opacity .25s ease;  /* fade, no delay by default */
+  opacity: 0;
+  transition: opacity .25s ease;
+  cursor: pointer;
 }
 
 /* —— Sliding white panel —————————————————————————————————— */
@@ -212,23 +213,23 @@
   height: 100%;
   background: #fff;
   position: relative;
-  transform: translateX(100%);    /* off-screen on load */
+  transform: translateX(100%);
   transition: transform .30s ease;
 }
 
 /* —— OPEN state (add/remove via React state) —————————————— */
 .chat-filters.open {
-  opacity: 1;                     /* wrapper fades in  */
-  pointer-events: auto;           /* now clickable     */
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .chat-filters.open .content {
-  transform: translateX(0);       /* slide in          */
+  transform: translateX(0);
 }
 
 .chat-filters.open .overlay {
-  opacity: .5;                    /* overlay fades in, */
-  transition-delay: .30s;         /* after panel slides in */
+  opacity: .5;
+  transition-delay: .30s;
 }
 
 .chat-filters .content .close {
