@@ -9,6 +9,7 @@ import ChatBubble    from '../components/chat/ChatBubble.jsx'
 import ChatInput     from '../components/chat/ChatInput.jsx'
 import attachIcon from '../img/attach.png'
 import sendIcon from '../img/send.png'
+import filtersIcon from '../img/filters.png'
 import logo from '../img/logo.png'
 import '../styles/resetstyle.css'
 
@@ -77,6 +78,9 @@ export default function ChatPage() {
           <div className="chat-main">
             <div className="window">
               <div className="content">
+                <div className="options-icon">
+                  <img src={filtersIcon} alt=""/>
+                </div>
                 <div className="messages">
                   <div className="bubble user">
                     <p>Are you ready to rock and roll?</p></div>
