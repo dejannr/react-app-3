@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useFetch } from '../hooks/useFetch.jsx'
 import { usePost }  from '../hooks/usePost.jsx'
 
@@ -6,23 +6,24 @@ import ChatWrapper   from '../components/chat/ChatWrapper.jsx'
 import ChatSidepanel from '../components/chat/ChatSidepanel.jsx'
 import ChatFilters   from '../components/chat/ChatFilters.jsx'
 import ChatMain      from '../components/chat/ChatMain.jsx'
+
 import '../styles/resetstyle.css'
 import '../styles/chat.css'
 
 export default function ChatPage() {
-  // ─────── User check ───────
+  /* ────────── Odoo-user check ────────── */
   const { data: user, loading: uLoading, error: uError } =
     useFetch('/get_username', {}, true)
 
-  // ─────── Bot POST hook ───────
+  /* ────────── Bot POST hook ────────── */
   const {
-    data: bot,
+    data:    bot,
     loading: bLoading,
-    error:  bError,
+    error:   bError,
     postData,
   } = usePost('/chat')
 
-  // ─────── Chat state ───────
+  /* ────────── Dummy starter conversation ────────── */
   const initialBotReply = (
     <>
       <h1>Excavation</h1>
@@ -50,33 +51,45 @@ export default function ChatPage() {
 
   const [msgs, setMsgs] = useState([
     { from: 'user', text: 'Are you ready to rock and roll?' },
-    { from: 'bot',  text: 'Absolutely! Let’s rock and roll — what’s on the agenda today?' },
+    { from: 'bot',  text: 'Absolutely! Let’s rock and roll—what’s on the agenda today?' },
     { from: 'user', text: 'Tell me something about excavation.' },
     { from: 'bot',  component: initialBotReply },
   ])
 
+  /* ────────── UI state ────────── */
   const [showFilters, setShowFilters] = useState(false)
+  const [canceled,    setCanceled]    = useState(false)
+  const ignoreNextReply = useRef(false)   // discard late reply if true
 
-  // ─────── Append bot reply from hook ───────
-  useEffect(() => {
-    if (bot?.reply) {
-      setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
-    }
-  }, [bot])
-
-  // ─────── Send handler ───────
+  /* ────────── Send & Cancel ────────── */
   const handleSend = (text) => {
+    ignoreNextReply.current = false
+    setCanceled(false)
     setMsgs(prev => [...prev, { from: 'user', text }])
     postData({ message: text })
   }
 
-  // ─────── Early returns ───────
+  const handleCancel = () => {
+    ignoreNextReply.current = true
+    setCanceled(true)
+    // ⬇️ turn the cancel into a real bot bubble
+    setMsgs(prev => [...prev, { from: 'bot', text: 'You canceled the message' }])
+  }
+
+  /* ────────── Append bot reply if not canceled ────────── */
+  useEffect(() => {
+    if (bot?.reply && !ignoreNextReply.current) {
+      setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
+    }
+  }, [bot])
+
+  /* ────────── Early returns ────────── */
   if (uLoading) return <p>Checking login…</p>
   if (uError || !user?.login) {
     return <p style={{ color: 'crimson' }}>Please log in to Odoo first.</p>
   }
 
-  // ─────── Dummy chat list (replace with real data later) ───────
+  /* ────────── Dummy chat list ────────── */
   const chatList = [
     { id: 1, title: '2024_42 Disruption log May 22/May 23', active: true },
     { id: 2, title: '2024_42 Disruption log May 24/May 25' },
@@ -84,20 +97,24 @@ export default function ChatPage() {
     { id: 4, title: '2024_42 Disruption log May 28/May 29' },
   ]
 
+  /* ────────── Render ────────── */
   return (
     <ChatWrapper>
       <ChatSidepanel chats={chatList} />
 
-      <ChatFilters open={showFilters} onClose={() => setShowFilters(false)}>
-        {/* 👉 put real filter controls here */}
-      </ChatFilters>
+      <ChatFilters
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+      />
 
       <ChatMain
         messages={msgs}
         loading={bLoading}
-        onSend={handleSend}
-        onOpenFilters={() => setShowFilters(true)}
         error={bError}
+        canceled={canceled}
+        onSend={handleSend}
+        onCancel={handleCancel}
+        onOpenFilters={() => setShowFilters(true)}
       />
     </ChatWrapper>
   )

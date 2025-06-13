@@ -5,32 +5,28 @@ import ChatLoader    from './ChatLoader.jsx'
 
 /**
  * Main chat area: message window + composer.
- *
- * Props
- * ──────
- * messages      – array [{ from: 'user'|'bot', text|component }]
- * loading       – true while waiting for a bot reply
- * error         – error object from request (optional)
- * onSend        – fn(text)  called when user submits a message
- * onOpenFilters – fn()      opens the filters side-panel
  */
 export default function ChatMain({
   messages,
   loading,
+  canceled,
   error,
   onSend,
+  onCancel,
   onOpenFilters,
 }) {
-  /* ─── Auto-scroll to newest message ─── */
+  /* Are we waiting for a reply now? */
+  const waiting = loading && !canceled
+
+  /* Auto-scroll on new content */
   const bottomRef = useRef(null)
   useEffect(() => {
-    // smooth scroll only if container exists
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, loading])
+  }, [messages, waiting])
 
   return (
     <div className="chat-main">
-      {/* ────────── Scrollable message window ────────── */}
+      {/* ─────── Message window ─────── */}
       <div className="window">
         <div className="content">
           <div className="options-icon" onClick={onOpenFilters}>
@@ -44,17 +40,20 @@ export default function ChatMain({
               </div>
             ))}
 
-            {/* Loader bubble while fetching bot reply */}
-            {loading && <ChatLoader />}
+            {/* Loader while waiting */}
+            {waiting && <ChatLoader />}
 
-            {/* Invisible anchor for auto-scroll */}
             <div ref={bottomRef} />
           </div>
         </div>
       </div>
 
-      {/* ────────── Composer & error display ────────── */}
-      <ChatComposer onSend={onSend} disabled={loading} />
+      {/* ─────── Composer & errors ─────── */}
+      <ChatComposer
+        onSend={onSend}
+        onCancel={onCancel}
+        waiting={waiting}
+      />
 
       {error && (
         <p style={{ color: 'red', textAlign: 'center', marginTop: 8 }}>

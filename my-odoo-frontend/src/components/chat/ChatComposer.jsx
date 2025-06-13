@@ -1,22 +1,29 @@
 import React, { useState } from 'react'
 import attachIcon from '../../img/attach.png'
 import sendIcon   from '../../img/send.png'
+import cancelIcon from '../../img/cancel.png'
 
 /**
- * Bottom input bar for composing and sending messages.
+ * Bottom input bar.
  *
  * Props
  * ──────
- * onSend   (fn)   – called with the trimmed text when user hits Enter or clicks send
- * disabled (bool) – disables input & send button while a request is in flight
+ * onSend   – fn(text)     called when user submits
+ * onCancel – fn()         called when user clicks cancel
+ * waiting  – boolean      true while reply is pending
  */
-export default function ChatComposer({ onSend, disabled = false }) {
+export default function ChatComposer({ onSend, onCancel, waiting = false }) {
   const [text, setText] = useState('')
 
   const submit = () => {
-    if (!text.trim() || disabled) return
+    if (!text.trim() || waiting) return
     onSend(text.trim())
     setText('')
+  }
+
+  const handleButton = () => {
+    if (waiting) onCancel()
+    else         submit()
   }
 
   return (
@@ -32,15 +39,15 @@ export default function ChatComposer({ onSend, disabled = false }) {
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && submit()}
-          disabled={disabled}
+          disabled={waiting}
         />
 
         <div
-          className={`send ${disabled ? 'disabled' : ''}`}
-          onClick={submit}
-          title={disabled ? 'Waiting for reply…' : 'Send'}
+          className={`send ${waiting ? 'cancel' : ''}`}
+          onClick={handleButton}
+          title={waiting ? 'Cancel' : 'Send'}
         >
-          <img src={sendIcon} alt="" />
+          <img src={waiting ? cancelIcon : sendIcon} alt="" />
         </div>
       </div>
     </div>
