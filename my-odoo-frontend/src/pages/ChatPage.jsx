@@ -2,9 +2,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { useFetch } from '../hooks/useFetch.jsx'
-import { usePost  } from '../hooks/usePost.jsx'
-import useSearchRead from '../hooks/useSearchRaad.jsx'   // ← fixed path
+import { useFetch }      from '../hooks/useFetch.jsx'
+import { usePost }       from '../hooks/usePost.jsx'
+import useSearchRead     from '../hooks/useSearchRead.jsx'   // ← fixed path
 
 import ChatWrapper   from '../components/chat/ChatWrapper.jsx'
 import ChatSidepanel from '../components/chat/ChatSidepanel.jsx'
@@ -19,22 +19,55 @@ export default function ChatPage() {
   const { id } = useParams()
   const chatId = Number(id)
 
-  /* ───── Fetch chat list from Odoo ───── */
+  /* ───── Filters UI state ───── */
+  const [showFilters, setShowFilters] = useState(false)
+
+  /* ───── Fetch chat list ───── */
   const {
-    data:    chatList,          // array of {id, name}
+    data:    chatList,          // [{ id, name }, …]
     loading: loadingChatList,
     error:   errorChatList,
   } = useSearchRead(
     'lu.report',
-    [['usage_mode', '=', 'chat']],   // domain
-    ['id', 'name'],                  // fields
+    [['usage_mode', '=', 'chat']],
+    ['id', 'name'],
   )
 
-  /* ───── Find selected chat ───── */
+  /* ───── Fetch chat history ───── */
+  const {
+    data:    chatResults,       // [{ name, chat_result, datetime_created }, …]
+    loading: loadingChatResults,
+    error:   errorChatResults,
+  } = useSearchRead(
+    'lu.chatresult',
+    [['report_id', '=', chatId]],
+    ['name', 'chat_result', 'datetime_created'],
+  )
+
+  /* ───── Selected chat ───── */
   const chat = useMemo(
     () => (chatList || []).find(c => c.id === chatId),
     [chatList, chatId],
   )
+
+  /* ───── Assemble message array from history ───── */
+  const [msgs, setMsgs] = useState([])
+  useEffect(() => {
+    if (!chatResults) return
+
+    // sort by creation time (oldest → newest)
+    const sorted = [...chatResults].sort(
+      (a, b) => new Date(a.datetime_created) - new Date(b.datetime_created),
+    )
+
+    const history = []
+    sorted.forEach(r => {
+      history.push({ from: 'user', text: r.name })
+      history.push({ from: 'bot',  text: r.chat_result })
+    })
+
+    setMsgs(history)
+  }, [chatResults])
 
   /* ───── POST hook with cancel ───── */
   const {
@@ -45,28 +78,7 @@ export default function ChatPage() {
     cancel,
   } = usePost('/chat')
 
-  /* ───── Dummy starter conversation ───── */
-  const initialBotReply = (
-    <>
-      <h1>Excavation</h1>
-      <p>
-        Excavation is the process of removing earth, rock or other materials
-        from a site to form a cavity, hole or foundation. It’s fundamental in
-        fields ranging from construction and mining to archaeology.
-      </p>
-    </>
-  )
-
-  /* ───── Message state ───── */
-  const [msgs, setMsgs] = useState([
-    { from: 'user', text: 'Are you ready to rock and roll?' },
-    { from: 'bot',  text: 'Absolutely! Let’s rock and roll—what’s on the agenda today?' },
-    { from: 'user', text: 'Tell me something about excavation.' },
-    { from: 'bot',  component: initialBotReply },
-  ])
-
-  /* ───── UI state ───── */
-  const [showFilters, setShowFilters] = useState(false)
+  /* ───── Ignore-next-reply flag ───── */
   const ignoreNextReply = useRef(false)
 
   /* ───── Handlers ───── */
@@ -82,7 +94,7 @@ export default function ChatPage() {
     setMsgs(prev => [...prev, { from: 'bot', text: 'You canceled the message' }])
   }
 
-  /* ───── Process bot reply ───── */
+  /* ───── Append bot reply ───── */
   useEffect(() => {
     if (bot?.reply && !ignoreNextReply.current) {
       setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
@@ -90,8 +102,9 @@ export default function ChatPage() {
   }, [bot])
 
   /* ───── Render ───── */
-  if (loadingChatList) return <p>Loading chats…</p>
-  if (errorChatList)   return <p style={{ color: 'crimson' }}>Error: {errorChatList.message}</p>
+  if (loadingChatList || loadingChatResults) return <p>Loading…</p>
+  if (errorChatList)    return <p style={{ color: 'crimson' }}>Error: {errorChatList.message}</p>
+  if (errorChatResults) return <p style={{ color: 'crimson' }}>Error: {errorChatResults.message}</p>
 
   return (
     <ChatWrapper>

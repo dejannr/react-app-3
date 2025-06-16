@@ -391,6 +391,12 @@
 .chat-main .window .content .messages .bubble.bot h5 { font-size: 14px; }
 .chat-main .window .content .messages .bubble.bot h6 { font-size: 13px; }
 
+.chat-main .window .content .messages .bubble.bot a {
+
+  color: #f05a40;
+
+}
+
 /* Unordered lists */
 .chat-main .window .content .messages .bubble.bot ul {
   margin: 0 0 1em 1.5em;

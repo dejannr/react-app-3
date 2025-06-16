@@ -1,3 +1,4 @@
+// src/pages/ChatMain.jsx
 import React, { useEffect, useRef } from 'react'
 import filtersIcon   from '../../img/filters.png'
 import ChatComposer  from './ChatComposer.jsx'
@@ -36,11 +37,15 @@ export default function ChatMain({
           <div className="messages">
             {messages.map((m, i) => (
               <div key={i} className={`bubble ${m.from}`}>
-                {m.component ? m.component : <p>{m.text}</p>}
+                {m.component
+                  ? m.component                                            // custom React element
+                  : m.from === 'bot'
+                    ? <div dangerouslySetInnerHTML={{ __html: m.text }} /> // render HTML
+                    : <p>{m.text}</p>                                      // user plain-text
+                }
               </div>
             ))}
 
-            {/* Loader while waiting */}
             {waiting && <ChatLoader />}
 
             <div ref={bottomRef} />
