@@ -1,0 +1,49 @@
+/* src/styles/loading.css */
+
+.auth-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;             /* adjust if you don’t want full-screen */
+  background: #fafafa;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+}
+
+.loader div {
+  width: 12px;
+  height: 12px;
+  margin: 0 6px;
+  background: #f05a40;
+  border-radius: 50%;
+  animation: bounce 0.6s infinite ease-in-out both;
+}
+.loader div:nth-child(1) { animation-delay: -0.32s; }
+.loader div:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40%           { transform: scale(1); }
+}
+
+.loading-text {
+  margin-top: 14px;
+  font-size: 0.95rem;
+  color: #555;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-in-out 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.auth-error {
+  color: #f05a40;
+  font-weight: bold;
+  text-align: center;
+}

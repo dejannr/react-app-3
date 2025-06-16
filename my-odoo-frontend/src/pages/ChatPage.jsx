@@ -11,9 +11,6 @@ import '../styles/resetstyle.css'
 import '../styles/chat.css'
 
 export default function ChatPage() {
-  /* ─────────── Login check ─────────── */
-  const { data: user, loading: uLoading, error: uError } =
-    useFetch('/get_username', {}, true)
 
   /* ─────────── POST hook with cancel ─────────── */
   const {
@@ -82,12 +79,6 @@ export default function ChatPage() {
       setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
     }
   }, [bot])
-
-  /* ───── Early returns ───── */
-  if (uLoading) return <p>Checking login…</p>
-  if (uError || !user?.login) {
-    return <p style={{ color: 'crimson' }}>Please log in to Odoo first.</p>
-  }
 
   /* Dummy chat list */
   const chatList = [
