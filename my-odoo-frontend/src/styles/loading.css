@@ -47,3 +47,22 @@
   font-weight: bold;
   text-align: center;
 }
+
+/* Centered error box */
+.auth-error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;        /* full viewport height */
+  background: #fafafa;  /* match the loading background */
+}
+
+.auth-error-text {
+  color: #f05a40;
+  background: #fff3f1;               /* very light tint of accent */
+  padding: 14px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-size: 1.05rem;
+  text-align: center;
+}

@@ -10,15 +10,18 @@ export default function AuthProvider({ children }) {
   if (loading) {
     return (
       <div className="auth-loading">
-        <div className="loader">
-          <div /><div /><div />
-        </div>
+        <div className="loader"><div/><div/><div/></div>
+        <p className="loading-text">Verifying login credentials</p>
       </div>
     )
   }
 
   if (error || !user?.login) {
-    return <p className="auth-error">Please log in to Odoo first.</p>
+    return (
+      <div className="auth-error-container">
+        <p className="auth-error-text">Please log in to Lupa first.</p>
+      </div>
+    )
   }
 
   return <>{children}</>
