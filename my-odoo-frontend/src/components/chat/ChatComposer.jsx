@@ -1,4 +1,4 @@
-//src/components/chat/ChatComporer.jsx
+// src/components/chat/ChatComposer.jsx
 
 import React, { useState } from 'react'
 import attachIcon from '../../img/attach.png'
@@ -40,7 +40,13 @@ export default function ChatComposer({ onSend, onCancel, waiting = false }) {
           placeholder="Type here..."
           value={text}
           onChange={e => setText(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && submit()}
+          onKeyDown={e => {
+            // only send on Enter if Shift is NOT pressed
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              submit()
+            }
+          }}
           // disabled={waiting}
         />
 
