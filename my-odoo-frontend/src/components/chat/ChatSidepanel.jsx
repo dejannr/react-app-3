@@ -17,13 +17,13 @@ export default function ChatSidepanel({ chats }) {
       <h2 className="heading">Chats</h2>
 
       <div className="bubbles">
-        {chats.map(({ id, title }) => (
+        {chats.map(({ id, name }) => (
           <NavLink
             key={id}
             to={`/chat/${id}`}
             className={({ isActive }) => `bubble ${isActive ? 'active' : ''}`}
           >
-            <h3>{title}</h3>
+            <h3>{name}</h3>
           </NavLink>
         ))}
       </div>

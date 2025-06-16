@@ -1,8 +1,10 @@
 // src/pages/ChatPage.jsx
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
+
 import { useFetch } from '../hooks/useFetch.jsx'
 import { usePost  } from '../hooks/usePost.jsx'
+import useSearchRead from '../hooks/useSearchRaad.jsx'   // ← fixed path
 
 import ChatWrapper   from '../components/chat/ChatWrapper.jsx'
 import ChatSidepanel from '../components/chat/ChatSidepanel.jsx'
@@ -12,23 +14,29 @@ import ChatMain      from '../components/chat/ChatMain.jsx'
 import '../styles/resetstyle.css'
 import '../styles/chat.css'
 
-// dummy list of chats; you can fetch this instead if you like
-const CHAT_LIST = [
-  { id: 1, title: '2024_42 Disruption log May 22/May 23' },
-  { id: 2, title: '2024_42 Disruption log May 24/May 25' },
-  { id: 3, title: '2024_42 Disruption log May 26/May 27' },
-  { id: 4, title: '2024_42 Disruption log May 28/May 29' },
-]
-
 export default function ChatPage() {
+  /* ───── URL param ───── */
   const { id } = useParams()
   const chatId = Number(id)
 
-  // find this chat in the list
-  const chat = useMemo(() => CHAT_LIST.find(c => c.id === chatId), [chatId])
-  // if chat not found you could show a 404 or redirect
+  /* ───── Fetch chat list from Odoo ───── */
+  const {
+    data:    chatList,          // array of {id, name}
+    loading: loadingChatList,
+    error:   errorChatList,
+  } = useSearchRead(
+    'lu.report',
+    [['usage_mode', '=', 'chat']],   // domain
+    ['id', 'name'],                  // fields
+  )
 
-  /* ─────────── POST hook with cancel ─────────── */
+  /* ───── Find selected chat ───── */
+  const chat = useMemo(
+    () => (chatList || []).find(c => c.id === chatId),
+    [chatList, chatId],
+  )
+
+  /* ───── POST hook with cancel ───── */
   const {
     data:    bot,
     loading: bLoading,
@@ -46,10 +54,10 @@ export default function ChatPage() {
         from a site to form a cavity, hole or foundation. It’s fundamental in
         fields ranging from construction and mining to archaeology.
       </p>
-      {/* ... */}
     </>
   )
 
+  /* ───── Message state ───── */
   const [msgs, setMsgs] = useState([
     { from: 'user', text: 'Are you ready to rock and roll?' },
     { from: 'bot',  text: 'Absolutely! Let’s rock and roll—what’s on the agenda today?' },
@@ -71,20 +79,23 @@ export default function ChatPage() {
   const handleCancel = () => {
     cancel()
     ignoreNextReply.current = true
-    setMsgs(prev => [...prev,
-      { from: 'bot', text: 'You canceled the message' },
-    ])
+    setMsgs(prev => [...prev, { from: 'bot', text: 'You canceled the message' }])
   }
 
+  /* ───── Process bot reply ───── */
   useEffect(() => {
     if (bot?.reply && !ignoreNextReply.current) {
       setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
     }
   }, [bot])
 
+  /* ───── Render ───── */
+  if (loadingChatList) return <p>Loading chats…</p>
+  if (errorChatList)   return <p style={{ color: 'crimson' }}>Error: {errorChatList.message}</p>
+
   return (
     <ChatWrapper>
-      <ChatSidepanel chats={CHAT_LIST} />
+      <ChatSidepanel chats={chatList || []} />
 
       <ChatFilters
         open={showFilters}
