@@ -1,11 +1,13 @@
+// src/components/chat/ChatSidepanel.jsx
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import logo from '../../img/logo.png'
 
 export default function ChatSidepanel({ chats }) {
   return (
     <div className="chat-sidepanel">
       <div className="logo">
-        <img src={logo} alt="" />
+        <img src={logo} alt="Logo" />
       </div>
 
       <div className="search">
@@ -15,10 +17,14 @@ export default function ChatSidepanel({ chats }) {
       <h2 className="heading">Chats</h2>
 
       <div className="bubbles">
-        {chats.map(({ id, title, active }) => (
-          <div key={id} className={`bubble ${active ? 'active' : ''}`}>
+        {chats.map(({ id, title }) => (
+          <NavLink
+            key={id}
+            to={`/chat/${id}`}
+            className={({ isActive }) => `bubble ${isActive ? 'active' : ''}`}
+          >
             <h3>{title}</h3>
-          </div>
+          </NavLink>
         ))}
       </div>
     </div>

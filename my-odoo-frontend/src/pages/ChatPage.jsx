@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+// src/pages/ChatPage.jsx
+import React, { useEffect, useRef, useState, useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import { useFetch } from '../hooks/useFetch.jsx'
-import { usePost  } from '../hooks/usePost.jsx'     // ← same path, updated file
+import { usePost  } from '../hooks/usePost.jsx'
 
 import ChatWrapper   from '../components/chat/ChatWrapper.jsx'
 import ChatSidepanel from '../components/chat/ChatSidepanel.jsx'
@@ -10,7 +12,21 @@ import ChatMain      from '../components/chat/ChatMain.jsx'
 import '../styles/resetstyle.css'
 import '../styles/chat.css'
 
+// dummy list of chats; you can fetch this instead if you like
+const CHAT_LIST = [
+  { id: 1, title: '2024_42 Disruption log May 22/May 23' },
+  { id: 2, title: '2024_42 Disruption log May 24/May 25' },
+  { id: 3, title: '2024_42 Disruption log May 26/May 27' },
+  { id: 4, title: '2024_42 Disruption log May 28/May 29' },
+]
+
 export default function ChatPage() {
+  const { id } = useParams()
+  const chatId = Number(id)
+
+  // find this chat in the list
+  const chat = useMemo(() => CHAT_LIST.find(c => c.id === chatId), [chatId])
+  // if chat not found you could show a 404 or redirect
 
   /* ─────────── POST hook with cancel ─────────── */
   const {
@@ -18,7 +34,7 @@ export default function ChatPage() {
     loading: bLoading,
     error:   bError,
     postData,
-    cancel,                      // ← new cancel fn
+    cancel,
   } = usePost('/chat')
 
   /* ───── Dummy starter conversation ───── */
@@ -30,20 +46,7 @@ export default function ChatPage() {
         from a site to form a cavity, hole or foundation. It’s fundamental in
         fields ranging from construction and mining to archaeology.
       </p>
-
-      <h2>1. Purposes of Excavation</h2>
-      <ul>
-        <li><strong>Construction:</strong> Foundations, basements, trenches…</li>
-        <li><strong>Mining &amp; Quarrying:</strong> Open-pit or underground.</li>
-        <li><strong>Archaeology:</strong> Carefully uncovering artifacts.</li>
-      </ul>
-
-      <h2>2. Methods &amp; Equipment</h2>
-      <ul>
-        <li><strong>Manual:</strong> Shovels, picks, trowels.</li>
-        <li><strong>Mechanical:</strong> Excavators, backhoes, bulldozers.</li>
-        <li><strong>Specialized:</strong> Dewatering, blasting in rock.</li>
-      </ul>
+      {/* ... */}
     </>
   )
 
@@ -62,36 +65,26 @@ export default function ChatPage() {
   const handleSend = (text) => {
     ignoreNextReply.current = false
     setMsgs(prev => [...prev, { from: 'user', text }])
-    postData({ message: text })
+    postData({ message: text, chatId })
   }
 
   const handleCancel = () => {
-    cancel()                                      // ← abort request
+    cancel()
     ignoreNextReply.current = true
     setMsgs(prev => [...prev,
       { from: 'bot', text: 'You canceled the message' },
     ])
   }
 
-  /* Append bot reply only if not canceled */
   useEffect(() => {
     if (bot?.reply && !ignoreNextReply.current) {
       setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
     }
   }, [bot])
 
-  /* Dummy chat list */
-  const chatList = [
-    { id: 1, title: '2024_42 Disruption log May 22/May 23', active: true },
-    { id: 2, title: '2024_42 Disruption log May 24/May 25' },
-    { id: 3, title: '2024_42 Disruption log May 26/May 27' },
-    { id: 4, title: '2024_42 Disruption log May 28/May 29' },
-  ]
-
-  /* ───── Render ───── */
   return (
     <ChatWrapper>
-      <ChatSidepanel chats={chatList} />
+      <ChatSidepanel chats={CHAT_LIST} />
 
       <ChatFilters
         open={showFilters}
