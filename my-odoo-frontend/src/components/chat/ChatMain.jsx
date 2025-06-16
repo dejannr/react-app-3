@@ -1,4 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+// src/components/chat/ChatMain.jsx
+
+import React, { useLayoutEffect, useRef } from 'react'
 import filtersIcon   from '../../img/filters.png'
 import ChatComposer  from './ChatComposer.jsx'
 import ChatLoader    from './ChatLoader.jsx'
@@ -6,75 +8,78 @@ import ChatLoader    from './ChatLoader.jsx'
 export default function ChatMain({
   chatId,
   messages,
-  loading,          // waiting for bot reply
-  historyLoading,   // waiting for lu.chatresult
+  loading,
   canceled,
   error,
   onSend,
   onCancel,
   onOpenFilters,
 }) {
-  const waiting = loading && !canceled
+  const messagesRef  = useRef(null)
+  const bottomRef    = useRef(null)
+  const prevChatId   = useRef(chatId)
+  const prevLen      = useRef(0)
 
-  /* ───── Auto-scroll ───── */
-  const bottomRef      = useRef(null)
-  const firstRenderRef = useRef(true)      // instant scroll on first load
-  const prevChatIdRef  = useRef(chatId)
+  useLayoutEffect(() => {
+    if (!messagesRef.current || !bottomRef.current) return
 
-  useEffect(() => {
-    // reset rule whenever the user picks a different chat
-    if (prevChatIdRef.current !== chatId) {
-      firstRenderRef.current = true
-      prevChatIdRef.current  = chatId
+    const len = messages.length
+    let behavior = 'smooth'
+
+    // Chat switched or first load → instant
+    if (prevChatId.current !== chatId || prevLen.current === 0) {
+      behavior = 'auto'
     }
 
-    if (!bottomRef.current) return
-    bottomRef.current.scrollIntoView({
-      behavior: firstRenderRef.current ? 'auto' : 'smooth',
-    })
-    firstRenderRef.current = false
-  }, [chatId, messages, waiting])
+    // Temporarily override the container’s scroll-behavior
+    const container = messagesRef.current
+    const prevScrollBehavior = container.style.scrollBehavior
+    container.style.scrollBehavior = behavior
+
+    // Jump to bottom
+    bottomRef.current.scrollIntoView()
+
+    // Restore whatever was there before
+    container.style.scrollBehavior = prevScrollBehavior
+
+    // Update refs
+    prevChatId.current = chatId
+    prevLen.current    = len
+  }, [chatId, messages])
 
   return (
     <div className="chat-main">
-      {/* ─────── Message window ─────── */}
       <div className="window">
         <div className="content">
           <div className="options-icon" onClick={onOpenFilters}>
             <img src={filtersIcon} alt="" />
           </div>
 
-          <div className="messages">
+          <div
+            className="messages"
+            ref={messagesRef}
+            style={{ overflowY: 'auto', height: '100%' }}
+          >
             {messages.map((m, i) => (
               <div key={i} className={`bubble ${m.from}`}>
-                {m.component
-                  ? m.component
-                  : m.from === 'bot'
-                    ? <div dangerouslySetInnerHTML={{ __html: m.text }} />
-                    : <p>{m.text}</p>
+                {m.from === 'bot'
+                  ? <div dangerouslySetInnerHTML={{ __html: m.text }} />
+                  : <p>{m.text}</p>
                 }
               </div>
             ))}
 
-            {waiting && <ChatLoader />}
-
-            {/* — loader overlay while history is loading — */}
-            {/*{historyLoading && (*/}
-            {/*  <div className="history-loader-overlay">*/}
-            {/*    <ChatLoader />*/}
-            {/*  </div>*/}
-            {/*)}*/}
+            {loading && <ChatLoader />}
 
             <div ref={bottomRef} />
           </div>
         </div>
       </div>
 
-      {/* ─────── Composer & errors ─────── */}
       <ChatComposer
         onSend={onSend}
         onCancel={onCancel}
-        waiting={waiting}
+        waiting={loading && !canceled}
       />
 
       {error && (

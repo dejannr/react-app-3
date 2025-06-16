@@ -1,3 +1,5 @@
+//src/pages/ChatPage.jsx
+
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 

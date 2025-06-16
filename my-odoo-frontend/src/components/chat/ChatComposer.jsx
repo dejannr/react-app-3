@@ -1,3 +1,5 @@
+//src/components/chat/ChatComporer.jsx
+
 import React, { useState } from 'react'
 import attachIcon from '../../img/attach.png'
 import sendIcon   from '../../img/send.png'
