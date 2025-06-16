@@ -1,29 +1,39 @@
-// src/pages/ChatMain.jsx
 import React, { useEffect, useRef } from 'react'
 import filtersIcon   from '../../img/filters.png'
 import ChatComposer  from './ChatComposer.jsx'
 import ChatLoader    from './ChatLoader.jsx'
 
-/**
- * Main chat area: message window + composer.
- */
 export default function ChatMain({
+  chatId,
   messages,
-  loading,
+  loading,          // waiting for bot reply
+  historyLoading,   // waiting for lu.chatresult
   canceled,
   error,
   onSend,
   onCancel,
   onOpenFilters,
 }) {
-  /* Are we waiting for a reply now? */
   const waiting = loading && !canceled
 
-  /* Auto-scroll on new content */
-  const bottomRef = useRef(null)
+  /* ───── Auto-scroll ───── */
+  const bottomRef      = useRef(null)
+  const firstRenderRef = useRef(true)      // instant scroll on first load
+  const prevChatIdRef  = useRef(chatId)
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, waiting])
+    // reset rule whenever the user picks a different chat
+    if (prevChatIdRef.current !== chatId) {
+      firstRenderRef.current = true
+      prevChatIdRef.current  = chatId
+    }
+
+    if (!bottomRef.current) return
+    bottomRef.current.scrollIntoView({
+      behavior: firstRenderRef.current ? 'auto' : 'smooth',
+    })
+    firstRenderRef.current = false
+  }, [chatId, messages, waiting])
 
   return (
     <div className="chat-main">
@@ -38,15 +48,22 @@ export default function ChatMain({
             {messages.map((m, i) => (
               <div key={i} className={`bubble ${m.from}`}>
                 {m.component
-                  ? m.component                                            // custom React element
+                  ? m.component
                   : m.from === 'bot'
-                    ? <div dangerouslySetInnerHTML={{ __html: m.text }} /> // render HTML
-                    : <p>{m.text}</p>                                      // user plain-text
+                    ? <div dangerouslySetInnerHTML={{ __html: m.text }} />
+                    : <p>{m.text}</p>
                 }
               </div>
             ))}
 
             {waiting && <ChatLoader />}
+
+            {/* — loader overlay while history is loading — */}
+            {/*{historyLoading && (*/}
+            {/*  <div className="history-loader-overlay">*/}
+            {/*    <ChatLoader />*/}
+            {/*  </div>*/}
+            {/*)}*/}
 
             <div ref={bottomRef} />
           </div>

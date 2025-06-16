@@ -1,10 +1,8 @@
-// src/pages/ChatPage.jsx
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { useFetch }      from '../hooks/useFetch.jsx'
-import { usePost }       from '../hooks/usePost.jsx'
-import useSearchRead     from '../hooks/useSearchRead.jsx'   // ← fixed path
+import { usePost }      from '../hooks/usePost.jsx'
+import useSearchRead    from '../hooks/useSearchRead.jsx'
 
 import ChatWrapper   from '../components/chat/ChatWrapper.jsx'
 import ChatSidepanel from '../components/chat/ChatSidepanel.jsx'
@@ -19,12 +17,12 @@ export default function ChatPage() {
   const { id } = useParams()
   const chatId = Number(id)
 
-  /* ───── Filters UI state ───── */
+  /* ───── Filters UI ───── */
   const [showFilters, setShowFilters] = useState(false)
 
-  /* ───── Fetch chat list ───── */
+  /* ───── Chat list (left sidebar) ───── */
   const {
-    data:    chatList,          // [{ id, name }, …]
+    data:    chatList,
     loading: loadingChatList,
     error:   errorChatList,
   } = useSearchRead(
@@ -33,10 +31,10 @@ export default function ChatPage() {
     ['id', 'name'],
   )
 
-  /* ───── Fetch chat history ───── */
+  /* ───── Chat history (lu.chatresult) ───── */
   const {
-    data:    chatResults,       // [{ name, chat_result, datetime_created }, …]
-    loading: loadingChatResults,
+    data:    chatResults,
+    loading: loadingChatResults,          // ← flag we’ll pass down
     error:   errorChatResults,
   } = useSearchRead(
     'lu.chatresult',
@@ -44,32 +42,24 @@ export default function ChatPage() {
     ['name', 'chat_result', 'datetime_created'],
   )
 
-  /* ───── Selected chat ───── */
-  const chat = useMemo(
-    () => (chatList || []).find(c => c.id === chatId),
-    [chatList, chatId],
-  )
-
-  /* ───── Assemble message array from history ───── */
+  /* ───── Build message array once results arrive ───── */
   const [msgs, setMsgs] = useState([])
-  useEffect(() => {
-    if (!chatResults) return
 
-    // sort by creation time (oldest → newest)
+  useEffect(() => {
+    if (!chatResults) return          // keep old msgs while new history loads
+
     const sorted = [...chatResults].sort(
       (a, b) => new Date(a.datetime_created) - new Date(b.datetime_created),
     )
-
     const history = []
     sorted.forEach(r => {
       history.push({ from: 'user', text: r.name })
       history.push({ from: 'bot',  text: r.chat_result })
     })
-
     setMsgs(history)
   }, [chatResults])
 
-  /* ───── POST hook with cancel ───── */
+  /* ───── Chat POST hook ───── */
   const {
     data:    bot,
     loading: bLoading,
@@ -78,10 +68,8 @@ export default function ChatPage() {
     cancel,
   } = usePost('/chat')
 
-  /* ───── Ignore-next-reply flag ───── */
   const ignoreNextReply = useRef(false)
 
-  /* ───── Handlers ───── */
   const handleSend = (text) => {
     ignoreNextReply.current = false
     setMsgs(prev => [...prev, { from: 'user', text }])
@@ -94,7 +82,6 @@ export default function ChatPage() {
     setMsgs(prev => [...prev, { from: 'bot', text: 'You canceled the message' }])
   }
 
-  /* ───── Append bot reply ───── */
   useEffect(() => {
     if (bot?.reply && !ignoreNextReply.current) {
       setMsgs(prev => [...prev, { from: 'bot', text: bot.reply }])
@@ -102,9 +89,12 @@ export default function ChatPage() {
   }, [bot])
 
   /* ───── Render ───── */
-  if (loadingChatList || loadingChatResults) return <p>Loading…</p>
-  if (errorChatList)    return <p style={{ color: 'crimson' }}>Error: {errorChatList.message}</p>
-  if (errorChatResults) return <p style={{ color: 'crimson' }}>Error: {errorChatResults.message}</p>
+  if (loadingChatList)               // only the very first time
+    return <p>Loading…</p>
+  if (errorChatList)
+    return <p style={{ color: 'crimson' }}>Error: {errorChatList.message}</p>
+  if (errorChatResults)
+    return <p style={{ color: 'crimson' }}>Error: {errorChatResults.message}</p>
 
   return (
     <ChatWrapper>
@@ -116,8 +106,10 @@ export default function ChatPage() {
       />
 
       <ChatMain
+        chatId={chatId}
         messages={msgs}
         loading={bLoading}
+        historyLoading={loadingChatResults}
         error={bError}
         onSend={handleSend}
         onCancel={handleCancel}
